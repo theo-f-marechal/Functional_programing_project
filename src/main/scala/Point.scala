@@ -1,7 +1,7 @@
 sealed trait Point{}
 
 case class Point2D private(x: Float, y: Float) extends Point{}
-case class Point3D private(x: Float, y: Float, z: Float) extends Point {}
+case class Point3D private(x: Float, y: Float, z: Float) extends Point{}
 
 object Point {
   def newPoint2D(x: Float, y: Float): Point = Point2D(x,y)
