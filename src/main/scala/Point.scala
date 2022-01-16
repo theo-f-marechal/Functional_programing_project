@@ -4,26 +4,20 @@ case class Point2D private(x: Float, y: Float) extends Point{}
 case class Point3D private(x: Float, y: Float, z: Float) extends Point{}
 
 object Point {
-  def newPoint2D(x: Float, y: Float): Point2D = Point2D(x,y)
-  def newPoint3D(x: Float, y: Float, z: Float): Point3D = Point3D(x,y,z)
-
-  def deserialization(line: String,sep: String = ","): Either[String,Point] = {
-    val pattern2 = ("""^[+-]?[0-9]+\.?[0-9]*\""" +
-      sep + """[+-]?[0-9]+\.?[0-9]*$""").r
-    val pattern3 = ("""^[+-]?[0-9]+\.?[0-9]*\""" +
-      sep + """[+-]?[0-9]+\.?[0-9]*\""" +
-      sep + """[+-]?[0-9]+\.?[0-9]*$""").r
+  def deserialization(line: List[String]): Either[String,Point] ={
+    val pattern = """^[+-]?[0-9]+\.?[0-9]*"""
     line match {
-      case pattern2() => Right(newPoint2D(
-        line.split(sep)(0).toFloat,
-        line.split(sep)(1).toFloat
-      ))
-      case pattern3() => Right(newPoint3D(
-        line.split(sep)(0).toFloat,
-        line.split(sep)(1).toFloat,
-        line.split(sep)(2).toFloat
-      ))
-      case _ => Left("No point could be built from the line: " + line)
+      case Nil => Left("No arguments given")
+      case _::Nil => Left("Missing at least one argument")
+      case x::y::Nil =>
+        if (x.matches(pattern) && y.matches(pattern))
+          Right(Point2D(x.toFloat,y.toFloat))
+        else Left("One of the argument is invalid")
+      case x::y::z::Nil =>
+        if (x.matches(pattern) && y.matches(pattern) && z.matches(pattern))
+          Right(Point3D(x.toFloat,y.toFloat,z.toFloat))
+        else Left("One of the argument is invalid")
+      case _ => Left("Too much argument")
     }
   }
 }
