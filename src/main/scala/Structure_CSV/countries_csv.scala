@@ -1,57 +1,59 @@
 package Structure_CSV
 
-case class countries_csv(id : Option[id],
-                         code : Option[code],
-                         name : Option[name],
-                         continent : Option[continent],
-                         wikipedia_link : Option[wikipedia_link],
-                         keywords : Option[keywords])
+case class countries_csv(id : Country_id,
+                         code : Code,
+                         name : String,
+                         continent : Option[Continent],
+                         internet_link : Option[Internet_link],
+                         keywords : Option[String])
 
-case class id private(id: Long) extends AnyVal
-object id {
-  def new_id(x: Option[Long]): Option[id] = x match {
+case class Country_id private(Id: Long) extends AnyVal
+object Id {
+  def new_id(x: Option[Long]): Option[Country_id] = x match {
     case None => None
-    case _ if x.get < 0 => None
-    case _ => Some(id(x.get))
+    case Some(x) if x < 0 => None
+    case Some(x) => Some(Country_id(x))
   }
 }
 
-case class code private(code_name: String) extends AnyVal
+case class Code private(code_name: String) extends AnyVal
 object code {
-  def new_code(x: Option[String]): Option[code] = x match {
-    case None => None
-    case _ => Some(code(x.get))
+  def new_code(x: Option[String]): Option[Code] = {
+    val pattern = """^[A-Z]{2}$""".r
+    x match {
+      case None => None
+      case Some(x) => x.toUpperCase() match {
+        case pattern(_*) => Some(Code(x.toUpperCase()))
+        case _ => None
+      }
+    }
   }
 }
 
-case class name private(country_name: String) extends AnyVal
-object name {
-  def new_name(x: Option[String]): Option[name] = x match {
-    case None => None
-    case _ => Some(name(x.get))
-  }
-}
-
-case class continent private(continent_name: String) extends AnyVal
+case class Continent private(continent_name: String) extends AnyVal
 object continent {
-  def new_continent(x: Option[String]): Option[continent] = x match {
-    case None => None
-    case _ => Some(continent(x.get))
+  def new_continent(x: Option[String]): Option[Continent] = {
+    val pattern = """^AF|AN|AS|EU|NA|OC|SA$""".r
+    x match {
+      case None => None
+      case Some(x) => x.toUpperCase() match {
+        case pattern(_*) => Some(Continent(x.toUpperCase()))
+        case _ => None
+      }
+    }
   }
 }
 
-case class wikipedia_link private(link: String) extends AnyVal
-object wikipedia_link {
-  def new_wikipedia_link(x: Option[String]): Option[wikipedia_link] = x match {
-    case None => None
-    case _ => Some(wikipedia_link(x.get))
-  }
-}
-
-case class keywords private(key: String) extends AnyVal
-object keywords {
-  def new_keywords(x: Option[String]): Option[keywords] = x match {
-    case None => None
-    case _ => Some(keywords(x.get))
+case class Internet_link private(link: String) extends AnyVal
+object internet_link {
+  def new_internet_link(x: Option[String]): Option[Internet_link] = {
+    val pattern = """^http[s]?:\/\/[a-z]*\.?[a-z]+[\.[a-z]+]?[\/[a-z]*]?$""".r
+    x match {
+      case None => None
+      case Some(x) => x match {
+        case pattern(_*) => Some(Internet_link(x))
+        case _ => None
+      }
+    }
   }
 }
