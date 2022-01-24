@@ -64,11 +64,3 @@ object AirportRef {
     case Some(x) => Some(AirportRef(x))
   }
 }
-
-case class AirportIdent private(ident: String) extends AnyVal
-object AirportIdent {
-  def newAirportIdent(ident: Option[String]): Option[AirportIdent] = ident match {
-    case None => None
-    case Some(x) => Some(AirportIdent(x))
-  }
-}
