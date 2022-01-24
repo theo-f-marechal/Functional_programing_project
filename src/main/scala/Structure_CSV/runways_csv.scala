@@ -44,6 +44,15 @@ object Runways_csv{
       case Some(v) => Some(fun(v))
     }
 
+    def padding(listToPad : List[Option[Runway_argument]], n : Int = 8) : List[Option[Runway_argument]] = {
+      @tailrec
+      def aux(l: List[Option[Runway_argument]], n : Int = 8) : List[Option[Runway_argument]] = n match {
+        case 0 => listToPad
+        case _ => aux(None::listToPad)
+      }
+      aux(listToPad.reverse, n - listToPad.length).reverse
+    }
+
     val listF = List(
       {x : String => Runaway_id.new_id(x.toLongOption)},
       {x : String => Airport_ref.new_airport_ref(x.toLongOption)},
@@ -54,7 +63,7 @@ object Runways_csv{
       {x : String => makeOptionalArgument(Lighted,x.toIntOption)},
       {x : String => makeOptionalArgument(Closed,x.toIntOption)},
       {x : String => makeOptionalArgument(Le_ident,Option(x))})
-    val argsT = transformArgs(args,listF)
+    val argsT = padding(transformArgs(args,listF))
 
     val possibleErrors = List(
       "Missing id", "Missing ref", "Missing ident",
@@ -64,22 +73,22 @@ object Runways_csv{
 
     val errors = checkCondition(argsT, possibleErrors)
 
-    def liftOptionalArg(t : List[Option[Runway_argument]], i : Int): Option[Runway_argument] = {
+    /*def liftOptionalArg(t : List[Option[Runway_argument]], i : Int): Option[Runway_argument] = {
       val re = t.lift(i)
       re match {
         case None => None
         case Some(x) => x
       }
-    }
+    }*/
 
     argsT match {
       case Nil => Left("No argument given" :: errors)
       case l if l.length < 3 => Left(errors)
       case a::b::c::_ if a.isEmpty | b.isEmpty | c.isEmpty => Left(errors)
       case Some(id : Runaway_id)::Some(ref : Airport_ref)::Some(ident : Airport_ident) ::
-        Some(lenght : Length_ft) :: Some(width : Width_ft) :: Some(surface : Surface) ::
-        Some(light : Lighted) :: Some(closed : Closed) :: Some(le_ident : Le_ident) :: _
-      => Right(Runways_csv(id,ref,ident,Some(lenght),Some(width),Some(surface),Some(light),Some(closed),Some(le_ident)))
+        (length : Option[Length_ft]) :: (width : Option[Width_ft]) :: (surface : Option[Surface]) ::
+        (light : Option[Lighted]) :: (closed : Option[Closed]) :: (le_ident : Option[Le_ident]) :: _
+      => Right(Runways_csv(id,ref,ident,length,width,surface,light,closed,le_ident))
     }
   }
 }
