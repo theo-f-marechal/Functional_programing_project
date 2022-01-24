@@ -1,6 +1,6 @@
 import scala.io.Source
 
-object reader {
+object Reader {
   def csv[T](path : String, header: Boolean = false,sep: String = ",")
             (function: List[String] => Either[String,T]):List[Either[String,T]] = {
     val source = Source.fromFile(path)
