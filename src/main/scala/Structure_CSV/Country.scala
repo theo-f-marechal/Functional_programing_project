@@ -4,7 +4,6 @@ case class Country(id : CountryId,
                    code : Code,
                    name : String,
                    continent : Option[Continent],
-                   internetLink : Option[InternetLink],
                    keywords : Option[String])
 object Country {
   def deserialization(args : List[String]) : Either[String, Country] = {
@@ -16,13 +15,11 @@ object Country {
           Code.newCode(Option(code)),
           name,
           Continent.newContinent(t.lift(0)),
-          InternetLink.newInternetLink(t.lift(1)),
           t.lift(2)
         ) match {
           case Nil => Left("ERROR : ID, country code or name is missing or wrong")
           case Some(id : CountryId) :: Some(code : Code) :: (name : String) ::
-               Some(continent : Option[Continent]) :: Some(internetLink : Option[InternetLink]) ::
-               Some(keywords : Option[String]) :: _ => Right(Country(id,code,name,continent,internetLink,keywords))
+               Some(continent : Option[Continent]) :: Some(keywords : Option[String]) :: _ => Right(Country(id,code,name,continent,keywords))
           case _ => Left("ERROR : ID, country code or name is missing or wrong")
         }
       case _ => Left("ERROR : ID, country code or name is missing or wrong")
@@ -61,20 +58,6 @@ object Continent {
       case None => None
       case Some(x) => x.toUpperCase() match {
         case pattern(_*) => Some(Continent(x.toUpperCase()))
-        case _ => None
-      }
-    }
-  }
-}
-
-case class InternetLink private(link: String) extends AnyVal
-object InternetLink {
-  def newInternetLink(x: Option[String]): Option[InternetLink] = {
-    val pattern = """^http[s]?:\/\/[a-z]*\.?[a-z]+[\.[a-z]+]?[\/[a-z]*]?$""".r
-    x match {
-      case None => None
-      case Some(x) => x match {
-        case pattern(_*) => Some(InternetLink(x))
         case _ => None
       }
     }
