@@ -1,11 +1,34 @@
 package Structure_CSV
 
 case class Country(id : CountryId,
-                         code : Code,
-                         name : String,
-                         continent : Option[Continent],
-                         internetLink : Option[InternetLink],
-                         keywords : Option[String])
+                   code : Code,
+                   name : String,
+                   continent : Option[Continent],
+                   internetLink : Option[InternetLink],
+                   keywords : Option[String])
+object Country {
+  def deserialization(args : List[String]) : Either[String, Country] = {
+    args match {
+      case Nil => Left("ERROR : There is no argument")
+      case id::code::name::t =>
+        List(
+          CountryId.newId(id.toLongOption),
+          Code.newCode(Option(code)),
+          name,
+          Continent.newContinent(t.lift(0)),
+          InternetLink.newInternetLink(t.lift(1)),
+          t.lift(2)
+        ) match {
+          case Nil => Left("ERROR : ID, country code or name is missing or wrong")
+          case Some(id : CountryId) :: Some(code : Code) :: (name : String) ::
+               Some(continent : Option[Continent]) :: Some(internetLink : Option[InternetLink]) ::
+               Some(keywords : Option[String]) :: _ => Right(Country(id,code,name,continent,internetLink,keywords))
+          case _ => Left("ERROR : ID, country code or name is missing or wrong")
+        }
+      case _ => Left("ERROR : ID, country code or name is missing or wrong")
+    }
+  }
+}
 
 case class CountryId private(id: Long) extends AnyVal
 object CountryId {

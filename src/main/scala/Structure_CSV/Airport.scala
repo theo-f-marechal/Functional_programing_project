@@ -10,11 +10,12 @@ object Airport {
     args match {
       case Nil => Left("ERROR : There is no argument")
       case id::ident::airportType::name::t =>
-        List(AirportId.newId(id.toLongOption),
-             AirportIdent.newAirportIdent(Option(ident)),
-             airportType,
-             name,
-             IsoCountry.newIsoCountry(t.lift(4))
+        List(
+          AirportId.newId(id.toLongOption),
+          AirportIdent.newAirportIdent(Option(ident)),
+          airportType,
+          name,
+          IsoCountry.newIsoCountry(t.lift(4))
         ) match {
           case Nil => Left("ERROR : ID, Ident, Type, Name or Country Iso code are missing or wrong")
           case Some(id : AirportId) :: Some(ident : AirportIdent) ::
