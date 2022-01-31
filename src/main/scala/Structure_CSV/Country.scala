@@ -19,8 +19,8 @@ object Country {
         ) match {
           case Nil => Left("ERROR : ID, country code or name is missing or wrong")
           case Some(id : CountryId) :: Some(code : Code) :: (name : String) ::
-               Some(continent : Option[Continent]) :: Some(keywords : Option[String]) :: _ => Right(Country(id,code,name,continent,keywords))
-          case _ => Left("ERROR : ID, country code or name is missing or wrong")
+               (continent : Option[Continent]) :: (keywords : Option[String]) :: _ => Right(Country(id,code,name,continent,keywords))
+          case _ => Left(s"ERROR : ID, country code or name is missing or wrong")
         }
       case _ => Left("ERROR : ID, country code or name is missing or wrong")
     }
