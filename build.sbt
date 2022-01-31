@@ -10,3 +10,7 @@ lazy val root = (project in file("."))
 libraryDependencies += "org.scalameta" %% "munit" % "0.7.26" % Test
 
 testFrameworks += new TestFramework("munit.Framework")
+
+libraryDependencies += "org.scala-lang.modules" %% "scala-swing" % "3.0.0"
+
+libraryDependencies += "org.mongodb.scala" %% "mongo-scala-driver" % "2.9.0"
