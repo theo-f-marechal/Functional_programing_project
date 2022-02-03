@@ -27,7 +27,9 @@ object Country {
   }
 }
 
-case class CountryId private(id: Long) extends AnyVal
+case class CountryId private(id: Long) extends AnyVal {
+  override def toString: String = id.toString
+}
 object CountryId {
   def newId(x: Option[Long]): Option[CountryId] = x match {
     case None => None
@@ -36,7 +38,9 @@ object CountryId {
   }
 }
 
-case class Code private(codeName: String) extends AnyVal
+case class Code private(codeName: String) extends AnyVal {
+  override def toString: String = codeName
+}
 object Code {
   def newCode(x: Option[String]): Option[Code] = {
     val pattern = """^[A-Z]{2}$""".r
@@ -50,7 +54,9 @@ object Code {
   }
 }
 
-case class Continent private(continentName: String) extends AnyVal
+case class Continent private(continentName: String) extends AnyVal {
+  override def toString: String = continentName
+}
 object Continent {
   def newContinent(x: Option[String]): Option[Continent] = {
     val pattern = """^AF|AN|AS|EU|NA|OC|SA$""".r

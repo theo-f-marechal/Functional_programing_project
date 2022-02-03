@@ -6,6 +6,6 @@ object Reader {
     val source = Source.fromFile(path)
     val lines = source.getLines.toList
     source.close()
-    (if (header) lines.tail else lines).map(_.split(sep).map(_.trim).toList).map(function)
+    (if (header) lines.tail else lines).map(_.split(sep).map(_.replaceAll("^\"|\"$", "").trim).toList).map(function)
   }
 }

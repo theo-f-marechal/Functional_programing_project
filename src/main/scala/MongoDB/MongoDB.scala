@@ -1,5 +1,6 @@
 package MongoDB
 
+import Structure_CSV._
 import org.mongodb.scala.{Completed, Document, MongoClient, MongoCollection, MongoDatabase, Observable, Observer}
 
 import scala.concurrent.duration.Duration
@@ -9,16 +10,21 @@ class MongoDB {
 }
 object MongoDB {
 
-  def insertDocument() {
-    val mongoClient: MongoClient = MongoClient()
+  def insertCountry(list : List[Country]): Unit = {
+    val mongoClient : MongoClient = MongoClient()
 
-    val database: MongoDatabase = mongoClient.getDatabase("test")
-    val collection : MongoCollection[Document] = database.getCollection("testcollection")
+    val database : MongoDatabase = mongoClient.getDatabase("test")
+    val collection : MongoCollection[Document] = database.getCollection("countries")
 
-    val doc : Document = Document("_id" -> 2, "name" -> "MongoDB", "type" -> "database",
-      "count" -> 1, "info" -> Document("x" -> 203, "y" -> 102))
+    //IF List insertMane and IF One insertOne
+    val documents  = list.map( country => Document("_id" -> country.id.toString,
+                                                   "code" -> country.code.toString,
+                                                   "name" -> country.name,
+                                                   "continent" -> country.continent.getOrElse(None).toString,
+                                                   "keywords" -> country.keywords))
 
-    val observable: Observable[Completed] = collection.insertOne(doc)
+    //val observable : Observable[Completed] = collection.insertOne(Document())
+    val observable : Observable[Completed] = collection.insertMany(documents)
 
     val promise = Promise[Boolean]
     observable.subscribe(new Observer[Completed] {
