@@ -28,7 +28,9 @@ object Airport {
   }
 }
 
-case class AirportId private(id: Long) extends AnyVal
+case class AirportId private(id: Long) extends AnyVal {
+  override def toString: String = id.toString
+}
 object AirportId {
   def newId(x: Option[Long]): Option[AirportId] = x match {
     case None => None
@@ -37,7 +39,9 @@ object AirportId {
   }
 }
 
-case class AirportIdent private(ident: String) extends AnyVal
+case class AirportIdent private(ident: String) extends AnyVal {
+  override def toString: String = ident
+}
 object AirportIdent {
   def newAirportIdent(ident: Option[String]): Option[AirportIdent] = ident match {
     case None => None
@@ -45,7 +49,9 @@ object AirportIdent {
   }
 }
 
-case class IsoCountry private(isoCountry: String) extends AnyVal
+case class IsoCountry private(isoCountry: String) extends AnyVal {
+  override def toString: String = isoCountry
+}
 object IsoCountry {
   def newIsoCountry(x: Option[String]): Option[IsoCountry] = {
     val pattern = """^[A-Z]{2}$""".r
