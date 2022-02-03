@@ -28,7 +28,7 @@ object Runways{
           RunawayId.newId(a.toLongOption),
           AirportRef.newAirportRef(b.toLongOption),
           AirportIdent.newAirportIdent(Some(c)),
-          t.lift(3), t.lift(4)
+          t.lift(2), t.lift(5)
         ) match {
           case Nil => Left("ERROR => something went horribly wrong")
           case
@@ -48,7 +48,9 @@ object Runways{
 
 
 
-case class RunawayId private(id: Long) extends AnyVal
+case class RunawayId private(id: Long) extends AnyVal {
+  override def toString: String = id.toString
+}
 object RunawayId {
   def newId(id: Option[Long]): Option[RunawayId] = id match {
     case None => None
@@ -57,7 +59,9 @@ object RunawayId {
   }
 }
 
-case class AirportRef private(ref: Long) extends AnyVal
+case class AirportRef private(ref: Long) extends AnyVal {
+  override def toString: String = ref.toString
+}
 object AirportRef {
   def newAirportRef(ref: Option[Long]): Option[AirportRef] = ref match {
     case None => None

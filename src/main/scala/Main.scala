@@ -7,8 +7,12 @@ object Main {
     //val countryList = countryEitherList.collect { case Right(value) => value}
     //MongoDB.insertCountry(countryList)
 
-    val airportEitherList = Reader.csv("./data/airports.csv", header = true, ",")(Airport.deserialization)
-    val airportList = airportEitherList.collect { case Right(value) => value}
-    MongoDB.insertAirport(airportList)
+    //val airportEitherList = Reader.csv("./data/airports.csv", header = true, ",")(Airport.deserialization)
+    //val airportList = airportEitherList.collect { case Right(value) => value}
+    //MongoDB.insertAirport(airportList)
+
+    val runwaysEitherList = Reader.csv("./data/runways.csv", header = true, ",")(Runways.deserialization)
+    val runwaysList = runwaysEitherList.collect { case Right(value) => value}
+    MongoDB.insertRunways(runwaysList)
   }
 }
