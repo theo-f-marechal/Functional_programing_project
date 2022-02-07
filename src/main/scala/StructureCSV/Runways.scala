@@ -1,4 +1,4 @@
-package Structure_CSV
+package StructureCSV
 
 sealed trait Runway_argument
 

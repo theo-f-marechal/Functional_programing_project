@@ -1,5 +1,6 @@
-import Structure_CSV._
+import StructureCSV._
 import MongoDB._
+import Swing.UI
 
 object Main {
   def main(args: Array[String]): Unit = {
@@ -11,8 +12,10 @@ object Main {
     //val airportList = airportEitherList.collect { case Right(value) => value}
     //MongoDB.insertAirport(airportList)
 
-    val runwaysEitherList = Reader.csv("./data/runways.csv", header = true, ",")(Runways.deserialization)
-    val runwaysList = runwaysEitherList.collect { case Right(value) => value}
-    MongoDB.insertRunways(runwaysList)
+    //val runwaysEitherList = Reader.csv("./data/runways.csv", header = true, ",")(Runways.deserialization)
+    //val runwaysList = runwaysEitherList.collect { case Right(value) => value}
+    //MongoDB.insertRunways(runwaysList)
+    val ui = new UI
+    ui.visible = true
   }
 }

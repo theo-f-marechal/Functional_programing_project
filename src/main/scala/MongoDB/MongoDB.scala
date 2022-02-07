@@ -1,6 +1,6 @@
 package MongoDB
 
-import Structure_CSV._
+import StructureCSV._
 import org.mongodb.scala.{Completed, Document, MongoClient, MongoCollection, MongoDatabase, Observable, Observer}
 
 import scala.concurrent.duration.Duration

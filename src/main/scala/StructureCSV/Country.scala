@@ -1,4 +1,4 @@
-package Structure_CSV
+package StructureCSV
 
 case class Country(id : CountryId,
                    code : Code,

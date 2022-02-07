@@ -1,6 +1,6 @@
 import NonEmptyString.newNES
 
-class Test_NonEmptyString extends munit.FunSuite {
+class TestNonEmptyString extends munit.FunSuite {
   test("Empty String") {
     val t = newNES("")
     assertEquals(t ,None)

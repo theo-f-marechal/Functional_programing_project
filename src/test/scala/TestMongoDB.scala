@@ -1,6 +1,6 @@
 import MongoDB._
 
-class Test_MongoDB extends munit.FunSuite{
+class TestMongoDB extends munit.FunSuite{
   test("Testing padding") {
   }
 

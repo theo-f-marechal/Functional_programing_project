@@ -1,4 +1,4 @@
-package Structure_CSV
+package StructureCSV
 
 case class Airport(id : AirportId,
                     airportIdent : AirportIdent,
