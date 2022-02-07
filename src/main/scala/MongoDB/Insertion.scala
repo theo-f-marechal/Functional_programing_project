@@ -6,28 +6,24 @@ import org.mongodb.scala.{Completed, Document, MongoClient, MongoCollection, Mon
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Promise}
 
-class MongoDB {
-}
-object MongoDB {
+object Insertion {
 
   def insertRunways(list : List[Runways]) : Unit = {
     val mongoClient : MongoClient = MongoClient()
 
     val database : MongoDatabase = mongoClient.getDatabase("test")
-    val collection : MongoCollection[Document] = database.getCollection("runways")
+    val runwaysCollection : MongoCollection[Document] = database.getCollection("runways")
 
-    //IF List insertMane and IF One insertOne
-    val documents  = list.map( runway => Document("_id" -> runway.id.toString,
+    val runwaysDocument  = list.map( runway => Document("_id" -> runway.id.toString,
       "airportRef" -> runway.airportRef.toString,
       "airportIdent" -> runway.airportIdent.toString,
       "surface" -> runway.surface,
       "leIdent" -> runway.leIdent))
 
-    //val observable : Observable[Completed] = collection.insertOne(Document())
-    val observable : Observable[Completed] = collection.insertMany(documents)
+    val runwayObservable : Observable[Completed] = runwaysCollection.insertMany(runwaysDocument)
 
     val promise = Promise[Boolean]
-    observable.subscribe(new Observer[Completed] {
+    runwayObservable.subscribe(new Observer[Completed] {
 
       override def onNext(result: Completed): Unit = println("Inserted")
 
@@ -41,9 +37,7 @@ object MongoDB {
         promise.success(true)
       }
     })
-
-    val future = promise.future
-    Await.result(future, Duration(5, java.util.concurrent.TimeUnit.SECONDS))
+    Await.result(promise.future, Duration(5, java.util.concurrent.TimeUnit.SECONDS))
 
     mongoClient.close()
   }
@@ -52,20 +46,18 @@ object MongoDB {
     val mongoClient : MongoClient = MongoClient()
 
     val database : MongoDatabase = mongoClient.getDatabase("test")
-    val collection : MongoCollection[Document] = database.getCollection("airports")
+    val airportsCollection : MongoCollection[Document] = database.getCollection("airports")
 
-    //IF List insertMane and IF One insertOne
-    val documents  = list.map( airport => Document("_id" -> airport.id.toString,
-      "ident" -> airport.airportIdent.toString,
-      "type" -> airport.airportType,
-      "name" -> airport.name,
-      "isoCountry" -> airport.isoCountry.toString))
+    val airportsDocument  = list.map( airport => Document("_id" -> airport.id.toString,
+                                                          "ident" -> airport.airportIdent.toString,
+                                                          "type" -> airport.airportType,
+                                                          "name" -> airport.name,
+                                                          "isoCountry" -> airport.isoCountry.toString))
 
-    //val observable : Observable[Completed] = collection.insertOne(Document())
-    val observable : Observable[Completed] = collection.insertMany(documents)
+    val airportObservable : Observable[Completed] = airportsCollection.insertMany(airportsDocument)
 
     val promise = Promise[Boolean]
-    observable.subscribe(new Observer[Completed] {
+    airportObservable.subscribe(new Observer[Completed] {
 
       override def onNext(result: Completed): Unit = println("Inserted")
 
@@ -80,8 +72,7 @@ object MongoDB {
       }
     })
 
-    val future = promise.future
-    Await.result(future, Duration(5, java.util.concurrent.TimeUnit.SECONDS))
+    Await.result(promise.future, Duration(5, java.util.concurrent.TimeUnit.SECONDS))
 
     mongoClient.close()
   }
@@ -90,20 +81,18 @@ object MongoDB {
     val mongoClient : MongoClient = MongoClient()
 
     val database : MongoDatabase = mongoClient.getDatabase("test")
-    val collection : MongoCollection[Document] = database.getCollection("countries")
+    val countriesCollection : MongoCollection[Document] = database.getCollection("countries")
 
-    //IF List insertMane and IF One insertOne
-    val documents  = list.map( country => Document("_id" -> country.id.toString,
+    val countriesDocument  = list.map( country => Document("_id" -> country.id.toString,
                                                    "code" -> country.code.toString,
                                                    "name" -> country.name,
                                                    "continent" -> country.continent.getOrElse(None).toString,
                                                    "keywords" -> country.keywords))
 
-    //val observable : Observable[Completed] = collection.insertOne(Document())
-    val observable : Observable[Completed] = collection.insertMany(documents)
+    val countriesObservable : Observable[Completed] = countriesCollection.insertMany(countriesDocument)
 
     val promise = Promise[Boolean]
-    observable.subscribe(new Observer[Completed] {
+    countriesObservable.subscribe(new Observer[Completed] {
 
       override def onNext(result: Completed): Unit = println("Inserted")
 
@@ -118,10 +107,8 @@ object MongoDB {
       }
     })
 
-    val future = promise.future
-    Await.result(future, Duration(5, java.util.concurrent.TimeUnit.SECONDS))
+    Await.result(promise.future, Duration(5, java.util.concurrent.TimeUnit.SECONDS))
 
     mongoClient.close()
   }
-
 }
