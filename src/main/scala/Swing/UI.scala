@@ -1,5 +1,7 @@
 package Swing
-import StructureCSV.{Code, CountryId, NonEmptyString}
+import MongoDB.{Insertion, Reader}
+import StructureCSV.{Airport, Code, Country, NonEmptyString, Runways}
+import Parser.Parser
 
 import scala.swing.MenuBar.NoMenuBar.border
 import scala.swing._
@@ -74,7 +76,26 @@ class UI extends MainFrame {
   resultQueryScroll.verticalScrollBar
   query.contents += resultQueryScroll
 
+  val db = new BoxPanel(Orientation.Vertical)
+  val populateDB: Button = new Button("Populate the Data Base") {}
+  val emptyDB: Button = new Button("Empty the Data Base") {}
+  val dbButtons = new BoxPanel(Orientation.Horizontal)
+  dbButtons.contents += Swing.Glue
+  dbButtons.contents += populateDB
+  dbButtons.contents += Swing.HStrut(10)
+  dbButtons.contents += emptyDB
+  dbButtons.contents += Swing.Glue
+  val dbErrorMsg: TextArea = new TextArea("") { editable = false }
+  val dbErrorMsgScroll = new ScrollPane(dbErrorMsg)
+  resultQueryScroll.verticalScrollBar
+  db.contents += new Label("Welcome to the airport software. You can use that tab to populate the data base or empty it.")
+  db.contents += Swing.VStrut(10)
+  db.contents += dbButtons
+  db.contents += Swing.VStrut(10)
+  db.contents += dbErrorMsgScroll
+
   contents = new TabbedPane() {
+    pages += new TabbedPane.Page("Data Base", db )
     pages += new TabbedPane.Page("Report", report )
     pages += new TabbedPane.Page("Query", query)
   }
@@ -83,6 +104,8 @@ class UI extends MainFrame {
 
   listenTo(getQuery)
   listenTo(getReport)
+  listenTo(populateDB)
+  listenTo(emptyDB)
 
   reactions += {
     //Query
@@ -103,9 +126,25 @@ class UI extends MainFrame {
     //Report
     case ButtonClicked(`getReport`) =>
       resultReport.text = reportType.selection.index match {
-        case 0 => "1"
-        case 1 => "2"
-        case 2 => "3"
+        case 0 =>
+          Reader.getReport1().toString
+        case 1 =>
+          Reader.getReport2().toString
+        case 2 =>
+          Reader.getReport3().toString
     }
+
+    case ButtonClicked(`populateDB`) =>
+      val countryEitherList = Parser.csv("./data/countries.csv", header = true, ",")(Country.deserialization)
+      val countryList = countryEitherList.collect { case Right(value) => value}
+      Insertion.insertCountry(countryList)
+
+      val airportEitherList = Parser.csv("./data/airports.csv", header = true, ",")(Airport.deserialization)
+      val airportList = airportEitherList.collect { case Right(value) => value}
+      Insertion.insertAirport(airportList)
+
+      val runwaysEitherList = Parser.csv("./data/runways.csv", header = true, ",")(Runways.deserialization)
+      val runwaysList = runwaysEitherList.collect { case Right(value) => value}
+      Insertion.insertRunways(runwaysList)
   }
 }
