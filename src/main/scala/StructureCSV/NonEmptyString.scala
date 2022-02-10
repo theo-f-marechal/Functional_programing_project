@@ -1,3 +1,5 @@
+package StructureCSV
+
 final class NonEmptyString private(val str: String) extends AnyVal
 object NonEmptyString{
   def newNES(str : String): Option[NonEmptyString] = {

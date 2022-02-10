@@ -1,7 +1,10 @@
 package Swing
+import StructureCSV.{Code, CountryId, NonEmptyString}
+
 import scala.swing.MenuBar.NoMenuBar.border
 import scala.swing._
 import scala.swing.event.ButtonClicked
+
 
 class UI extends MainFrame {
   def restrictHeight(s: Component): Unit = {
@@ -20,8 +23,10 @@ class UI extends MainFrame {
 
   val getQuery: Button = new Button("Proceed") {}
   val resultQuery: TextArea = new TextArea("") { editable = false }
+
   val getReport: Button = new Button("Proceed") {}
   val resultReport: TextArea = new TextArea("") { editable = false }
+
   val countryName = new RadioButton("Name")
   val countryCode = new RadioButton("Code")
   countryName.selected = true
@@ -80,15 +85,27 @@ class UI extends MainFrame {
   listenTo(getReport)
 
   reactions += {
-    case ButtonClicked(`getQuery`) =>
-      if (countryName.selected)
-        println("Name : " + countryIdentifier.text)
-      else
-        println("Code : " + countryIdentifier.text)
-      resultQuery.text =  "Wow results"
+    //Query
+    case ButtonClicked(`getQuery`) => NonEmptyString.newNES(countryIdentifier.text) match {
+      case None =>
+        resultQuery.text = s"## ERROR ## : please enter a proper ${if (countryName.selected) "name" else "code"}"
+      case Some(value) =>
+        if (countryName.selected) {
+          resultQuery.text = value.str + " Name"
+        } else {
+          Code.newCode(Some(value.str)) match {
+            case None => resultQuery.text = "## ERROR ## : the format of the country code you provided is incorrect"
+            case Some(value) => resultQuery.text = value + " Code"
+          }
+        }
+    }
 
+    //Report
     case ButtonClicked(`getReport`) =>
-      println(reportType.selection.item)
-      resultReport.text =  reportType.selection.item
+      resultReport.text = reportType.selection.index match {
+        case 0 => "1"
+        case 1 => "2"
+        case 2 => "3"
+    }
   }
 }
