@@ -15,8 +15,12 @@ object Main {
     //val runwaysEitherList = Parser.csv("./data/runways.csv", header = true, ",")(Runways.deserialization)
     //val runwaysList = runwaysEitherList.collect { case Right(value) => value}
     //Insertion.insertRunways(runwaysList)
+
+    //Reader.query("GL")
+    //Reader.query("IO")
     Reader.getReport1()
-    val ui = new UI
-    ui.visible = true
+
+    //val ui = new UI
+    //ui.visible = true
   }
 }
