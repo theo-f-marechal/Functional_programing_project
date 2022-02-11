@@ -135,15 +135,15 @@ class UI extends MainFrame {
     }
 
     case ButtonClicked(`populateDB`) =>
-      val countryEitherList = Parser.csv("./data/countries.csv", header = true, ",")(Country.deserialization)
+      val countryEitherList = Parser.csv("./data/countries.csv", header = true)(Country.deserialization)
       val countryList = countryEitherList.collect { case Right(value) => value}
       Insertion.insertCountry(countryList)
 
-      val airportEitherList = Parser.csv("./data/airports.csv", header = true, ",")(Airport.deserialization)
+      val airportEitherList = Parser.csv("./data/airports.csv", header = true)(Airport.deserialization)
       val airportList = airportEitherList.collect { case Right(value) => value}
       Insertion.insertAirport(airportList)
 
-      val runwaysEitherList = Parser.csv("./data/runways.csv", header = true, ",")(Runways.deserialization)
+      val runwaysEitherList = Parser.csv("./data/runways.csv", header = true)(Runways.deserialization)
       val runwaysList = runwaysEitherList.collect { case Right(value) => value}
       Insertion.insertRunways(runwaysList)
   }

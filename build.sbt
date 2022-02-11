@@ -14,3 +14,5 @@ testFrameworks += new TestFramework("munit.Framework")
 libraryDependencies += "org.scala-lang.modules" %% "scala-swing" % "3.0.0"
 
 libraryDependencies += "org.mongodb.scala" %% "mongo-scala-driver" % "2.9.0"
+
+libraryDependencies += "org.typelevel" %% "cats-core" % "2.7.0"
