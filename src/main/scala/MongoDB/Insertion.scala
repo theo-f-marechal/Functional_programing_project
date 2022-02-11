@@ -49,10 +49,10 @@ object Insertion {
     val airportsCollection : MongoCollection[Document] = database.getCollection("airports")
 
     val airportsDocument  = list.map( airport => Document("_id" -> airport.id.toString,
-                                                          "ident" -> airport.airportIdent.toString,
-                                                          "type" -> airport.airportType,
-                                                          "name" -> airport.name,
-                                                          "isoCountry" -> airport.isoCountry.toString))
+                                                          "ident" -> airport.airportIdent.ident,
+                                                          "type" -> airport.airportType.airportType,
+                                                          "name" -> airport.name.name,
+                                                          "isoCountry" -> airport.isoCountry.isoCountry))
 
     val airportObservable : Observable[Completed] = airportsCollection.insertMany(airportsDocument)
 
@@ -85,9 +85,9 @@ object Insertion {
 
     val countriesDocument  = list.map( country => Document("_id" -> country.id.toString,
                                                    "code" -> country.code.toString,
-                                                   "name" -> country.name,
+                                                   "name" -> country.name.name,
                                                    "continent" -> country.continent.getOrElse(None).toString,
-                                                   "keywords" -> country.keywords))
+                                                   "keywords" -> country.keywords.getOrElse(None).toString))
 
     val countriesObservable : Observable[Completed] = countriesCollection.insertMany(countriesDocument)
 

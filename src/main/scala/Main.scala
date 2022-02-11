@@ -19,7 +19,7 @@ object Main {
 
     //Reader.query("GL")
     //Reader.query("IO")
-    Reader.getReport1()
+    //Reader.getReport1()
 
     val ui = new UI
     ui.visible = true

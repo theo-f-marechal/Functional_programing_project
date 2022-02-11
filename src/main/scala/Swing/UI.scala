@@ -1,7 +1,9 @@
 package Swing
 import MongoDB.{Insertion, Reader}
-import StructureCSV.{Airport, Code, Country, NonEmptyString, Runways}
+import StructureCSV.{Airport, Code, Country, Error, NonEmptyString, Runways}
 import Parser.Parser
+import StructureCSV.Error.AllErrorsOr
+import cats.data.Validated.{Invalid, Valid}
 
 import scala.swing.MenuBar.NoMenuBar.border
 import scala.swing._
@@ -17,41 +19,75 @@ class UI extends MainFrame {
 
   title = "functional programming project"
 
+  border = Swing.EmptyBorder(10, 10, 10, 10)
+
+
+  // ############################################################################################################
+
+  // DB tab
+
+  val db = new BoxPanel(Orientation.Vertical)
+  val populateDB: Button = new Button("Populate the Data Base") {}
+  val emptyDB: Button = new Button("Empty the Data Base") {}
+  val dbButtons = new BoxPanel(Orientation.Horizontal)
+  dbButtons.contents += Swing.Glue
+  dbButtons.contents += populateDB
+  dbButtons.contents += Swing.HStrut(10)
+  dbButtons.contents += emptyDB
+  dbButtons.contents += Swing.Glue
+  val dbErrorMsg: TextArea = new TextArea("") { editable = false }
+  val dbErrorMsgScroll = new ScrollPane(dbErrorMsg)
+  db.contents += new Label("Welcome to the airport software. You can use that tab to populate the data base or empty it.")
+  db.contents += Swing.VStrut(10)
+  db.contents += dbButtons
+  db.contents += Swing.VStrut(10)
+  db.contents += dbErrorMsgScroll
+
+
+  // ############################################################################################################
+
+  // Report tab
+
   val reportType = new ComboBox(List(
     "10 countries with highest number of airports (with count) and countries  with lowest number of airports.",
     "Type of runways (as indicated in \"surface\" column) per country.",
     "The top 10 most common runway latitude (indicated in \"le_ident\" column)."
   ))
-
-  val getQuery: Button = new Button("Proceed") {}
-  val resultQuery: TextArea = new TextArea("") { editable = false }
+  restrictHeight(reportType)
 
   val getReport: Button = new Button("Proceed") {}
   val resultReport: TextArea = new TextArea("") { editable = false }
 
-  val countryName = new RadioButton("Name")
-  val countryCode = new RadioButton("Code")
-  countryName.selected = true
-  val statusGroup = new ButtonGroup(countryName, countryCode)
-  val countryIdentifier: TextField = new TextField {columns = 32}
-  countryIdentifier.text = ""
-
-  restrictHeight(countryIdentifier)
-  restrictHeight(reportType)
-
-  val report_type = new BoxPanel(Orientation.Horizontal)
-  report_type.contents += new Label("Type of Report wanted : ")
-  report_type.contents += Swing.HStrut(5)
-  report_type.contents += reportType
+  val reportTypeBox = new BoxPanel(Orientation.Horizontal)
+  reportTypeBox.contents += new Label("Type of Report wanted : ")
+  reportTypeBox.contents += Swing.HStrut(5)
+  reportTypeBox.contents += reportType
 
   val report = new BoxPanel(Orientation.Vertical)
-  report.contents += report_type
+  report.contents += reportTypeBox
   report.contents += Swing.VStrut(5)
   report.contents += getReport
   report.contents += Swing.VStrut(5)
   val resultReportScroll = new ScrollPane(resultReport)
   resultReportScroll.verticalScrollBar
   report.contents += resultReportScroll
+
+
+  // ############################################################################################################
+
+  // Query tab
+
+  val getQuery: Button = new Button("Proceed") {}
+  val resultQuery: TextArea = new TextArea("") { editable = false }
+
+  val countryName = new RadioButton("Name")
+  val countryCode = new RadioButton("Code")
+  countryName.selected = true
+  val statusGroup = new ButtonGroup(countryName, countryCode)
+
+  val countryIdentifier: TextField = new TextField {columns = 32}
+  countryIdentifier.text = ""
+  restrictHeight(countryIdentifier)
 
   val query_nameCode = new BoxPanel(Orientation.Horizontal)
   query_nameCode.contents += new Label("Query by country's ")
@@ -76,23 +112,10 @@ class UI extends MainFrame {
   resultQueryScroll.verticalScrollBar
   query.contents += resultQueryScroll
 
-  val db = new BoxPanel(Orientation.Vertical)
-  val populateDB: Button = new Button("Populate the Data Base") {}
-  val emptyDB: Button = new Button("Empty the Data Base") {}
-  val dbButtons = new BoxPanel(Orientation.Horizontal)
-  dbButtons.contents += Swing.Glue
-  dbButtons.contents += populateDB
-  dbButtons.contents += Swing.HStrut(10)
-  dbButtons.contents += emptyDB
-  dbButtons.contents += Swing.Glue
-  val dbErrorMsg: TextArea = new TextArea("") { editable = false }
-  val dbErrorMsgScroll = new ScrollPane(dbErrorMsg)
-  resultQueryScroll.verticalScrollBar
-  db.contents += new Label("Welcome to the airport software. You can use that tab to populate the data base or empty it.")
-  db.contents += Swing.VStrut(10)
-  db.contents += dbButtons
-  db.contents += Swing.VStrut(10)
-  db.contents += dbErrorMsgScroll
+
+  // ############################################################################################################
+
+  // Tab creation
 
   contents = new TabbedPane() {
     pages += new TabbedPane.Page("Data Base", db )
@@ -100,7 +123,10 @@ class UI extends MainFrame {
     pages += new TabbedPane.Page("Query", query)
   }
 
-  border = Swing.EmptyBorder(10, 10, 10, 10)
+
+  // ############################################################################################################
+
+  // Reactive part of the UI
 
   listenTo(getQuery)
   listenTo(getReport)
@@ -116,14 +142,16 @@ class UI extends MainFrame {
         if (countryName.selected) {
           resultQuery.text = value.str + " Name"
         } else {
-          Code.newCode(Some(value.str)) match {
-            case None => resultQuery.text = "## ERROR ## : the format of the country code you provided is incorrect"
-            case Some(value) => resultQuery.text = value + " Code"
+          Code.validateCode(Some(value.str)) match {
+            case Invalid(error) => resultQuery.text = "## ERROR ##" + error.head.value
+            case Valid(value) => resultQuery.text = value + " Code"
           }
         }
     }
 
-    //Report
+    // ---------------------------------------------------------------------------------------------------------
+
+    // Report
     case ButtonClicked(`getReport`) =>
       resultReport.text = reportType.selection.index match {
         case 0 =>
@@ -134,17 +162,32 @@ class UI extends MainFrame {
           Reader.getReport3().toString
     }
 
+    // ---------------------------------------------------------------------------------------------------------
+
+    // DB
+
     case ButtonClicked(`populateDB`) =>
-      val countryEitherList = Parser.csv("./data/countries.csv", header = true)(Country.deserialization)
-      val countryList = countryEitherList.collect { case Right(value) => value}
-      Insertion.insertCountry(countryList)
+      // insertion is defined after the reaction
+      insertion("./data/countries.csv", header = true)(Country.deserialization)(Insertion.insertCountry)
+      insertion("./data/airports.csv", header = true)(Airport.deserialization)(Insertion.insertAirport)
 
-      val airportEitherList = Parser.csv("./data/airports.csv", header = true)(Airport.deserialization)
-      val airportList = airportEitherList.collect { case Right(value) => value}
-      Insertion.insertAirport(airportList)
-
-      val runwaysEitherList = Parser.csv("./data/runways.csv", header = true)(Runways.deserialization)
+      /*val runwaysEitherList = Parser.csv("./data/runways.csv", header = true)(Runways.deserialization)
       val runwaysList = runwaysEitherList.collect { case Right(value) => value}
-      Insertion.insertRunways(runwaysList)
+      Insertion.insertRunways(runwaysList)*/
   }
+
+  def insertion[T](path: String, header: Boolean)
+                  (deserializationFunction: List[String] => AllErrorsOr[T])
+                  (insertionFunction: List[T] => Unit): Unit = {
+    val eitherList = Parser.csv(path, header)(deserializationFunction)
+    val (percentageError, errorList, validList) = Error.separateErrorsResults(eitherList)
+    if (percentageError < 50) {
+      insertionFunction(validList)
+      dbErrorMsg.text += Error.formatError(errorList)
+    } else {
+      dbErrorMsg.text = "### Too many invalid lines, insertion was aborted ###\n"
+      dbErrorMsg.text += Error.formatError(errorList)
+    }
+  }
+
 }
