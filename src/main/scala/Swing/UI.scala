@@ -170,10 +170,7 @@ class UI extends MainFrame {
       // insertion is defined after the reaction
       insertion("./data/countries.csv", header = true)(Country.deserialization)(Insertion.insertCountry)
       insertion("./data/airports.csv", header = true)(Airport.deserialization)(Insertion.insertAirport)
-
-      /*val runwaysEitherList = Parser.csv("./data/runways.csv", header = true)(Runways.deserialization)
-      val runwaysList = runwaysEitherList.collect { case Right(value) => value}
-      Insertion.insertRunways(runwaysList)*/
+      insertion("./data/runways.csv", header = true)(Runways.deserialization)(Insertion.insertRunways)
   }
 
   def insertion[T](path: String, header: Boolean)

@@ -1,70 +1,72 @@
 package StructureCSV
 
-sealed trait Runway_argument
+import StructureCSV.AirportIdent.validateAirportIdent
+import StructureCSV.AirportRef.validateAirportRef
+import StructureCSV.Error.AllErrorsOr
+import StructureCSV.LeIdent.validateLeIdent
+import StructureCSV.RunwayId.validateRunwayId
+import StructureCSV.Surface.validateSurface
+import cats.implicits.{catsSyntaxTuple5Semigroupal, catsSyntaxValidatedId}
 
-case class Runways(
-                    id : RunawayId,
-                    airportRef : AirportRef,
-                    airportIdent : AirportIdent,
-                    surface : Option[String],
-                    leIdent : Option[String]
-                  )
-
-
+final case class Runways(id : RunwayId,
+                          airportRef : AirportRef,
+                          airportIdent : AirportIdent,
+                          surface : Option[Surface],
+                          leIdent : Option[LeIdent]
+                        )
 object Runways{
-
-  def getArgument[A,B](elt : String)(fun1 : String => Option[A])(fun2 : A => Option[B]): Option[B] = {
-    fun1(elt) match {
-      case None => None
-      case Some(x) => fun2(x)
-    }
+  def deserialization(args : List[String]): AllErrorsOr[Runways] = args match {
+    case Nil => Error("No arguments were given.").invalidNel
+    case _ => (
+      validateRunwayId(args.headOption),
+      validateAirportRef(args.lift(1)),
+      validateAirportIdent(args.lift(2)),
+      validateSurface(args.lift(3)),
+      validateLeIdent(args.lift(4)))
+      .mapN((validId, validAirportRef, validAirportIdent, validSurface, validLeIdent) =>
+      Runways(validId,validAirportRef,validAirportIdent,validSurface,validLeIdent))
   }
+}
 
-  def deserialization(args: List[String]): Either[String, Runways] = {
-    args match {
-      case Nil => Left("ERROR => No argument was given")
-      case a::b::c::t =>
-        List(
-          RunawayId.newId(a.toLongOption),
-          AirportRef.newAirportRef(b.toLongOption),
-          AirportIdent.newAirportIdent(Some(c)),
-          t.lift(2), t.lift(5)
-        ) match {
-          case Nil => Left("ERROR => something went horribly wrong")
-          case
-            Some(id : RunawayId)::Some(ref : AirportRef)::Some(ident: AirportIdent)::
-              (surface : Option[String])::(leIdent : Option[String])::_ =>
-            Right(Runways(id,ref, ident, surface, leIdent))
-          case _ =>
-            Left("ERROR => The id, the airport reference, the airport ident," +
-              " or a combination of the three is incorrect")
-        }
-      case _ =>
-        Left("ERROR => The id, the airport reference, the airport ident," +
-          " or a combination of the three is missing")
+
+case class RunwayId private(id: Long) extends AnyVal
+object RunwayId {
+  def validateRunwayId(idO: Option[String]): AllErrorsOr[RunwayId] = idO match {
+    case None => Error("Runway Id can't be empty.").invalidNel
+    case Some(id) => id.toLongOption match {
+      case None => Error("Runway Id must be a Long.").invalidNel
+      case Some(idL) =>
+        if (idL < 0) Error("Runway Id can't be negative.").invalidNel
+        else RunwayId(idL).validNel
     }
   }
 }
 
-
-
-case class RunawayId private(id: Long) extends AnyVal {
-  override def toString: String = id.toString
-}
-object RunawayId {
-  def newId(id: Option[Long]): Option[RunawayId] = id match {
-    case None => None
-    case Some(x) if x < 0 => None
-    case Some(x) => Some(RunawayId(x))
-  }
-}
-
-case class AirportRef private(ref: Long) extends AnyVal {
-  override def toString: String = ref.toString
-}
+case class AirportRef private(ref: Long) extends AnyVal
 object AirportRef {
-  def newAirportRef(ref: Option[Long]): Option[AirportRef] = ref match {
-    case None => None
-    case Some(x) => Some(AirportRef(x))
+  def validateAirportRef(refO: Option[String]): AllErrorsOr[AirportRef] = refO match {
+    case None => Error("Airport ref can't be empty.").invalidNel
+    case Some(ref) => ref.toLongOption match {
+      case None => Error("Airport Ref must be a Long.").invalidNel
+      case Some(refL) =>
+        if (refL < 0) Error("Airport ref can't be negative.").invalidNel
+        else AirportRef(refL).validNel
+    }
+  }
+}
+
+final case class Surface private(surface: String) extends AnyVal
+object Surface{
+  def validateSurface(surfaceO: Option[String]): AllErrorsOr[Option[Surface]] = surfaceO match {
+    case None => None.validNel
+    case Some(surface) => Some(Surface(surface)).validNel
+  }
+}
+
+final case class LeIdent private(leIdent: String) extends AnyVal
+object LeIdent{
+  def validateLeIdent(leIdentO: Option[String]): AllErrorsOr[Option[LeIdent]] = leIdentO match {
+    case None => None.validNel
+    case Some(leIdent) => Some(LeIdent(leIdent)).validNel
   }
 }

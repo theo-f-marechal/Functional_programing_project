@@ -14,11 +14,12 @@ object Insertion {
     val database : MongoDatabase = mongoClient.getDatabase("test")
     val runwaysCollection : MongoCollection[Document] = database.getCollection("runways")
 
-    val runwaysDocument  = list.map( runway => Document("_id" -> runway.id.toString,
+    val runwaysDocument  = list.map( runway => Document(
+      "_id" -> runway.id.toString,
       "airportRef" -> runway.airportRef.toString,
       "airportIdent" -> runway.airportIdent.toString,
-      "surface" -> runway.surface,
-      "leIdent" -> runway.leIdent))
+      "surface" -> runway.surface.getOrElse(None).toString,
+      "leIdent" -> runway.leIdent.getOrElse(None).toString))
 
     val runwayObservable : Observable[Completed] = runwaysCollection.insertMany(runwaysDocument)
 
@@ -48,11 +49,12 @@ object Insertion {
     val database : MongoDatabase = mongoClient.getDatabase("test")
     val airportsCollection : MongoCollection[Document] = database.getCollection("airports")
 
-    val airportsDocument  = list.map( airport => Document("_id" -> airport.id.toString,
-                                                          "ident" -> airport.airportIdent.ident,
-                                                          "type" -> airport.airportType.airportType,
-                                                          "name" -> airport.name.name,
-                                                          "isoCountry" -> airport.isoCountry.isoCountry))
+    val airportsDocument  = list.map( airport => Document(
+      "_id" -> airport.id.toString,
+      "ident" -> airport.airportIdent.ident,
+      "type" -> airport.airportType.airportType,
+      "name" -> airport.name.name,
+      "isoCountry" -> airport.isoCountry.isoCountry))
 
     val airportObservable : Observable[Completed] = airportsCollection.insertMany(airportsDocument)
 
@@ -83,11 +85,12 @@ object Insertion {
     val database : MongoDatabase = mongoClient.getDatabase("test")
     val countriesCollection : MongoCollection[Document] = database.getCollection("countries")
 
-    val countriesDocument  = list.map( country => Document("_id" -> country.id.toString,
-                                                   "code" -> country.code.toString,
-                                                   "name" -> country.name.name,
-                                                   "continent" -> country.continent.getOrElse(None).toString,
-                                                   "keywords" -> country.keywords.getOrElse(None).toString))
+    val countriesDocument  = list.map( country => Document(
+      "_id" -> country.id.toString,
+      "code" -> country.code.toString,
+      "name" -> country.name.name,
+      "continent" -> country.continent.getOrElse(None).toString,
+      "keywords" -> country.keywords.getOrElse(None).toString))
 
     val countriesObservable : Observable[Completed] = countriesCollection.insertMany(countriesDocument)
 
