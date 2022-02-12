@@ -31,12 +31,16 @@ object Country{
 final case class CountryId private(id: Long) extends AnyVal
 object CountryId {
   def validateId(idO: Option[String]): AllErrorsOr[CountryId] = idO match {
-    case None => Error("Country Id can't be empty.").invalidNel
-    case Some(id) => id.toLongOption match {
-      case None => Error("Country Id must be a Long.").invalidNel
-      case Some(idL) =>
-        if (idL < 0) Error("Country Id can't be negative.").invalidNel
-        else CountryId(idL).validNel
+    case None => Error("Country Id must exist.").invalidNel
+    case Some(id) =>
+      if (id.isEmpty || id.isBlank) Error("Country Id can't be empty or blank.").invalidNel
+      else{
+      id.toLongOption match {
+        case None => Error("Country Id must be a Long.").invalidNel
+        case Some(idL) =>
+          if (idL < 0) Error("Country Id can't be negative.").invalidNel
+          else CountryId(idL).validNel
+      }
     }
   }
 }
@@ -44,13 +48,16 @@ object CountryId {
 final case class Code private(code: String) extends AnyVal
 object Code {
   def validateCode(codeO: Option[String]): AllErrorsOr[Code] = codeO match {
-    case None => Error("Country name can't be empty.").invalidNel
+    case None => Error("Country code must exist.").invalidNel
     case Some(code) =>
-      val pattern = """^[A-Z]{2}$""".r
-      val codeU = code.toUpperCase
-      codeU match {
-        case pattern(_*) => Code(codeU).validNel
-        case _ => Error("Country code must follow the pattern.").invalidNel
+      if (code.isEmpty || code.isBlank) Error("Country code can't be empty or blank.").invalidNel
+      else {
+        val pattern = """^[A-Z]{2}$""".r
+        val codeU = code.toUpperCase
+        codeU match {
+          case pattern(_*) => Code(codeU).validNel
+          case _ => Error("Country code must follow the pattern.").invalidNel
+        }
       }
   }
 }
@@ -58,8 +65,10 @@ object Code {
 final case class Name private(name: String) extends AnyVal
 object Name {
   def validateName(nameO: Option[String]): AllErrorsOr[Name] = nameO match {
-    case None => Error("Country name can't be empty.").invalidNel
-    case Some(name) => Name(name).validNel
+    case None => Error("Country name must exist.").invalidNel
+    case Some(name) =>
+      if (name.isEmpty || name.isBlank) Error("Country name can't be empty or blank.").invalidNel
+      else Name(name).validNel
   }
 }
 
@@ -68,11 +77,14 @@ object Continent {
   def validateContinent(continentO: Option[String]): AllErrorsOr[Option[Continent]] = continentO match {
     case None => None.validNel
     case Some(continent) =>
-      val pattern = """^AF|AN|AS|EU|NA|OC|SA$""".r
-      val continentU = continent.toUpperCase
-      continentU match {
-        case pattern(_*) => Some(Continent(continentU)).validNel
-        case _ => Error("Country continent is unknown.").invalidNel
+      if (continent.isEmpty || continent.isBlank) None.validNel
+      else {
+        val pattern = """^AF|AN|AS|EU|NA|OC|SA$""".r
+        val continentU = continent.toUpperCase
+        continentU match {
+          case pattern(_*) => Some(Continent(continentU)).validNel
+          case _ => Error("Country continent is unknown.").invalidNel
+        }
       }
   }
 }
@@ -81,6 +93,8 @@ final case class Keywords private(keywords: String) extends AnyVal
 object Keywords{
   def validateKeywords(keywordsO: Option[String]): AllErrorsOr[Option[Keywords]] = keywordsO match {
     case None => None.validNel
-    case Some(keywords) => Some(Keywords(keywords)).validNel
+    case Some(keywords) =>
+      if (keywords.isEmpty || keywords.isBlank) None.validNel
+      else Some(Keywords(keywords)).validNel
   }
 }
