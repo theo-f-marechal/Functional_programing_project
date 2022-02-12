@@ -22,7 +22,7 @@ object Country{
       validateCode(args.lift(1)),
       validateName(args.lift(2)),
       validateContinent(args.lift(3)),
-      validateKeywords(args.lift(4))
+      validateKeywords(args.lift(5))
     ).mapN((validId,validCode,validName,validContinent,validKeywords) =>
       Country(validId,validCode,validName,validContinent,validKeywords))
   }

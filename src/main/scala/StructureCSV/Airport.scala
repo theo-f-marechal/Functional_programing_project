@@ -23,7 +23,7 @@ object Airport{
       validateAirportIdent(args.lift(1)),
       validateAirportType(args.lift(2)),
       validateAirportName(args.lift(3)),
-      validateIsoCountry(args.lift(4)))
+      validateIsoCountry(args.lift(8)))
       .mapN((validId,validAirportIdent,validAirportType,validName,validIsoCountry) =>
         Airport(validId,validAirportIdent,validAirportType,validName,validIsoCountry))
   }
@@ -77,13 +77,13 @@ object AirportName{
 final case class IsoCountry private(isoCountry: String) extends AnyVal
 object IsoCountry {
   def validateIsoCountry(isoO: Option[String]): AllErrorsOr[IsoCountry] = isoO match {
-    case None => Error("County iso can't be empty.").invalidNel
+    case None => Error("Country iso can't be empty.").invalidNel
     case Some(iso) =>
       val pattern = """^[A-Z]{2}$""".r
       val isoU = iso.toUpperCase()
       isoU match {
         case pattern(_*) => IsoCountry(isoU).validNel
-        case _ => Error("County iso's format i incorrect.").invalidNel
+        case _ => Error("Country iso's format is incorrect.").invalidNel
       }
   }
 }

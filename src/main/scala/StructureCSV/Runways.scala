@@ -21,8 +21,8 @@ object Runways{
       validateRunwayId(args.headOption),
       validateAirportRef(args.lift(1)),
       validateAirportIdent(args.lift(2)),
-      validateSurface(args.lift(3)),
-      validateLeIdent(args.lift(4)))
+      validateSurface(args.lift(5)),
+      validateLeIdent(args.lift(8)))
       .mapN((validId, validAirportRef, validAirportIdent, validSurface, validLeIdent) =>
       Runways(validId,validAirportRef,validAirportIdent,validSurface,validLeIdent))
   }

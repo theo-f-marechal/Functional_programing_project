@@ -180,10 +180,10 @@ class UI extends MainFrame {
     val (percentageError, errorList, validList) = Error.separateErrorsResults(eitherList)
     if (percentageError < 50) {
       insertionFunction(validList)
-      dbErrorMsg.text += Error.formatError(errorList)
+      dbErrorMsg.text += Error.formatError(errorList,path)
     } else {
-      dbErrorMsg.text = "### Too many invalid lines, insertion was aborted ###\n"
-      dbErrorMsg.text += Error.formatError(errorList)
+      dbErrorMsg.text = "### Too many invalid lines, insertion of" + path + " was aborted ###\n"
+      dbErrorMsg.text += Error.formatError(errorList,path)
     }
   }
 
