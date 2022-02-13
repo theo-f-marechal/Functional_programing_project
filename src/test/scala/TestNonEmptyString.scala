@@ -7,10 +7,11 @@ class TestNonEmptyString extends munit.FunSuite {
   }
 
   test("Non Empty String"){
-    val t = NonEmptyString.newNES("a")
-    assertEquals({t match{
-      case None => ""
-      case Some(x) => x.str}}
+    val str = NonEmptyString.newNES("a")
+    assertEquals({
+      str match{
+        case None => ""
+        case Some(x) => x.str}}
       ,"a")
   }
 }

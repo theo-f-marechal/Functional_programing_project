@@ -1,7 +1,7 @@
 import MongoDB._
 
 class TestMongoDB extends munit.FunSuite{
-  test("Testing padding") {
+  test("Testing") {
   }
 
 }
