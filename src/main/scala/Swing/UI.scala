@@ -14,6 +14,7 @@ import scala.swing.event.ButtonClicked
 
 
 class UI extends MainFrame {
+
   def restrictHeight(s: Component): Unit = {
     s.maximumSize = new Dimension(Short.MaxValue, s.preferredSize.height)
   }
@@ -52,9 +53,9 @@ class UI extends MainFrame {
   // Report tab
 
   val reportType = new ComboBox(List(
-    "10 countries with highest number of airports (with count) and countries  with lowest number of airports.",
-    "Type of runways (as indicated in \"surface\" column) per country.",
-    "The top 10 most common runway latitude (indicated in \"le_ident\" column)."
+    "Top 10 countries with the highest and lowest number of airports.",
+    "Type of runways' surfaces per country.",
+    "The top 10 most common runway latitude."
   ))
   restrictHeight(reportType)
 
@@ -165,7 +166,9 @@ class UI extends MainFrame {
         case 0 =>
           Formatting.report1(Reader.getReport1)
         case 1 =>
-          Reader.getReport2.toString
+          val reportObservable = Reader.getReport2
+          val report =  Await.result(reportObservable.toFuture(), Duration(10, java.util.concurrent.TimeUnit.SECONDS))
+          Formatting.report2(report)
         case 2 =>
           Formatting.report3(Reader.getReport3)
       }

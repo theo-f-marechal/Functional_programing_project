@@ -90,7 +90,7 @@ object Reader{
     (top10CountryFinalList, bottom10CountryFinalList)
   }
 
-  def getReport2: Seq[Document] = {
+  def getReport2: Observable[Document] = {
     val mongoClient : MongoClient = MongoClient()
 
     val database : MongoDatabase = mongoClient.getDatabase("test")
@@ -119,12 +119,7 @@ object Reader{
         "runways.airportIdent",
         "runways.leIdent")))
     ))
-
-    val report2Result = Await.result(queryObservable.toFuture(), Duration(10, java.util.concurrent.TimeUnit.SECONDS))
-
-    mongoClient.close()
-
-    report2Result
+    queryObservable
   }
 
   def getReport3: List[(String,String)] = {
@@ -155,8 +150,6 @@ object Reader{
           .last
           .replaceAll("^|}$", ""))
       }.toList
-
-    println(report3Result)
     report3
   }
 
