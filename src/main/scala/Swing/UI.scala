@@ -177,8 +177,8 @@ class UI extends MainFrame {
                   (deserializationFunction: List[String] => AllErrorsOr[T])
                   (insertionFunction: List[T] => Unit): Unit = {
     val eitherList = Parser.csv(path, header)(deserializationFunction)
-    val (percentageError, errorList, validList) = Error.separateErrorsResults(eitherList)
-    if (percentageError < 50) {
+    val (percentageValid, errorList, validList) = Error.separateErrorsResults(eitherList)
+    if (percentageValid > 50) {
       insertionFunction(validList)
       dbErrorMsg.text += Error.formatError(errorList,path)
     } else {
