@@ -1,9 +1,7 @@
 package Swing
 
-import StructureCSV.Airport
 import org.mongodb.scala.Document
 import org.mongodb.scala.bson.BsonArray
-import org.mongodb.scala.bson.collection.immutable.Document.fromSpecific
 
 import scala.jdk.CollectionConverters.ListHasAsScala
 

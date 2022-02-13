@@ -2,7 +2,6 @@ package MongoDB
 
 import StructureCSV._
 import org.mongodb.scala.bson.collection.immutable
-import org.mongodb.scala.model.Filters._
 import org.mongodb.scala.{Completed, Document, MongoClient, MongoCollection, MongoDatabase, Observable, Observer}
 
 import scala.concurrent.duration.Duration

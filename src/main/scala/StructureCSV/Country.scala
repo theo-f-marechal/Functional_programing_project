@@ -23,7 +23,7 @@ object Country{
       validateName(args.lift(2)),
       validateContinent(args.lift(3)),
       validateKeywords(args.lift(5))
-    ).mapN((validId,validCode,validName,validContinent,validKeywords) =>
+      ).mapN((validId,validCode,validName,validContinent,validKeywords) =>
       Country(validId,validCode,validName,validContinent,validKeywords))
   }
 }
@@ -35,13 +35,13 @@ object CountryId {
     case Some(id) =>
       if (id.isEmpty || id.isBlank) Error("Country Id can't be empty or blank.").invalidNel
       else{
-      id.toLongOption match {
-        case None => Error("Country Id must be a Long.").invalidNel
-        case Some(idL) =>
-          if (idL < 0) Error("Country Id can't be negative.").invalidNel
-          else CountryId(idL).validNel
+        id.toLongOption match {
+          case None => Error("Country Id must be a Long.").invalidNel
+          case Some(idL) =>
+            if (idL < 0) Error("Country Id can't be negative.").invalidNel
+            else CountryId(idL).validNel
+        }
       }
-    }
   }
 }
 

@@ -4,8 +4,8 @@ import cats.data.Validated.{Invalid, Valid}
 
 class TestAirport extends munit.FunSuite{
   test("Testing valid"){
-   val listToPad = List("6523","00A","heliport","Total Rf Heliport","40.07080078125","-74.93360137939453","11","NA","US","US-PA","Bensalem","no","00A","","00A","","","")
-   assertEquals(Airport.deserialization(listToPad),
+    val listToPad = List("6523","00A","heliport","Total Rf Heliport","40.07080078125","-74.93360137939453","11","NA","US","US-PA","Bensalem","no","00A","","00A","","","")
+    assertEquals(Airport.deserialization(listToPad),
       Valid(Airport(AirportId(6523),AirportIdent("00A"),AirportType("heliport"),AirportName("Total Rf Heliport"),IsoCountry("US"))))
   }
 

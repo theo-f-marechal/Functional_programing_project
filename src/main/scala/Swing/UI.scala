@@ -168,7 +168,7 @@ class UI extends MainFrame {
           Reader.getReport2.toString
         case 2 =>
           Formatting.report3(Reader.getReport3)
-    }
+      }
 
     // ---------------------------------------------------------------------------------------------------------
 

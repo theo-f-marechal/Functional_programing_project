@@ -9,10 +9,10 @@ import StructureCSV.Surface.validateSurface
 import cats.implicits.{catsSyntaxTuple5Semigroupal, catsSyntaxValidatedId}
 
 final case class Runways(id : RunwayId,
-                          airportRef : AirportId,
-                          airportIdent : AirportIdent,
-                          surface : Option[Surface],
-                          leIdent : Option[LeIdent]
+                         airportRef : AirportId,
+                         airportIdent : AirportIdent,
+                         surface : Option[Surface],
+                         leIdent : Option[LeIdent]
                         )
 object Runways{
   def deserialization(args : List[String]): AllErrorsOr[Runways] = args match {
@@ -24,7 +24,7 @@ object Runways{
       validateSurface(args.lift(5)),
       validateLeIdent(args.lift(8)))
       .mapN((validId, validAirportRef, validAirportIdent, validSurface, validLeIdent) =>
-      Runways(validId,validAirportRef,validAirportIdent,validSurface,validLeIdent))
+        Runways(validId,validAirportRef,validAirportIdent,validSurface,validLeIdent))
   }
 }
 
@@ -36,13 +36,13 @@ object RunwayId {
     case Some(id) =>
       if (id.isEmpty || id.isBlank) Error("Runway Id can't be empty or blank.").invalidNel
       else {
-      id.toLongOption match {
-        case None => Error("Runway Id must be a Long.").invalidNel
-        case Some(idL) =>
-          if (idL < 0) Error("Runway Id can't be negative.").invalidNel
-          else RunwayId(idL).validNel
+        id.toLongOption match {
+          case None => Error("Runway Id must be a Long.").invalidNel
+          case Some(idL) =>
+            if (idL < 0) Error("Runway Id can't be negative.").invalidNel
+            else RunwayId(idL).validNel
+        }
       }
-    }
   }
 }
 

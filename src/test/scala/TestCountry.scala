@@ -14,13 +14,13 @@ class TestCountry extends munit.FunSuite{
   test("Testing error for id: empty"){
     val listToPad = List("","AE","United Arab Emirates","AS","http://en.wikipedia.org/wiki/United_Arab_Emirates","UAE")
     assertEquals(Country.deserialization(listToPad),
-      Invalid(NonEmptyList(Error("Country Id must be a Long."),Nil)))
+      Invalid(NonEmptyList(Error("Country Id can't be empty or blank."),Nil)))
   }
 
   test("Testing error for id: blank"){
     val listToPad = List("    ","AE","United Arab Emirates","AS","http://en.wikipedia.org/wiki/United_Arab_Emirates","UAE")
     assertEquals(Country.deserialization(listToPad),
-      Invalid(NonEmptyList(Error("Country Id must be a Long."),Nil)))
+      Invalid(NonEmptyList(Error("Country Id can't be empty or blank."),Nil)))
   }
 
   test("Testing error for id: not Long"){

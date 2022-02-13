@@ -7,7 +7,6 @@ import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.Sorts.{ascending, descending}
 import org.mongodb.scala.{Document, MongoClient, MongoCollection, MongoDatabase, Observable}
 
-
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
