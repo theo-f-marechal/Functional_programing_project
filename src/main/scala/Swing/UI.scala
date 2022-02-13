@@ -176,26 +176,28 @@ class UI extends MainFrame {
 
     case ButtonClicked(`populateDB`) =>
       // insertion is defined after the reaction
-      insertion("./data/countries.csv", header = true)(Country.deserialization)(Insertion.insertCountry)
-      insertion("./data/airports.csv", header = true)(Airport.deserialization)(Insertion.insertAirport)
-      insertion("./data/runways.csv", header = true)(Runways.deserialization)(Insertion.insertRunways)
+      dbErrorMsg.text ="Starting insertion\n\n"
+      insertion("./data/countries.csv", "countries", header = true)(Country.deserialization)(Insertion.insertCountry) // "./data/countries.csv"
+      insertion("./data/airports.csv", "airports", header = true)(Airport.deserialization)(Insertion.insertAirport) // "./data/airports.csv"
+      insertion("./data/runways.csv", "runways", header = true)(Runways.deserialization)(Insertion.insertRunways) // "./data/runways.csv"
+      dbErrorMsg.text +="\n\nEnd of insertion"
 
     case ButtonClicked(`emptyDB`) =>
       emptyDb()
-      dbErrorMsg.text = "emptying db"
+      dbErrorMsg.text = "The database has been emptied"
   }
 
-  def insertion[T](path: String, header: Boolean)
+  def insertion[T](path: String, collection : String, header: Boolean)
                   (deserializationFunction: List[String] => AllErrorsOr[T])
                   (insertionFunction: List[T] => Unit): Unit = {
     val eitherList = Parser.csv(path, header)(deserializationFunction)
     val (percentageValid, errorList, validList) = Error.separateErrorsResults(eitherList)
     if (percentageValid > 50) {
       insertionFunction(validList)
-      dbErrorMsg.text += Error.formatError(errorList,path)
+      dbErrorMsg.text += Error.formatError(errorList,collection,path)
     } else {
-      dbErrorMsg.text = "### Too many invalid lines, insertion of" + path + " was aborted ###\n\n"
-      dbErrorMsg.text += Error.formatError(errorList,path)
+      dbErrorMsg.text += "### Too many invalid lines, insertion of" + path + " as " +  collection + " was aborted ###\n"
+      dbErrorMsg.text += Error.formatError(errorList,collection,path)
     }
   }
 

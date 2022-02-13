@@ -16,7 +16,7 @@ class TestError extends munit.FunSuite {
   }
 
   test("Testing formatError") {
-    val re = formatError(List(" - Line no°0 : 1 12 13  | end"," - Line no°1 : 2  | end"," - Line no°3 : 4  | end"), "/test/TestCSV")
-    assertEquals(re,"### Errors for /test/TestCSV ###\n - Line no°0 : 1 12 13  | end\n - Line no°1 : 2  | end\n - Line no°3 : 4  | end\n### End of logs for /test/TestCSV ###")
+    val re = formatError(List(" - Line no°0 : 1 12 13  | end"," - Line no°1 : 2  | end"," - Line no°3 : 4  | end"),"test" ,"/test/TestCSV")
+    assertEquals(re,"### Errors for /test/TestCSV as test ###\n - Line no°0 : 1 12 13  | end\n - Line no°1 : 2  | end\n - Line no°3 : 4  | end\n### End of logs ###")
   }
 }

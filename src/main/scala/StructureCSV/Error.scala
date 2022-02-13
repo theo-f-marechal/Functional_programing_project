@@ -23,8 +23,8 @@ object Error{
     aux(listErrors, 0, 0, Nil, Nil)
   }
 
-  def formatError(errors : List[String], pathCSV: String): String = {
-    errors.foldLeft("### Errors for " + pathCSV + " ###\n")((acc, elt) => acc + elt + "\n") +
-    "### End of logs for " + pathCSV + " ###\n\n"
+  def formatError(errors : List[String], collection: String , pathCSV: String): String = {
+    errors.foldLeft("### Errors for " + pathCSV + " as " + collection + " ###\n")((acc, elt) => acc + elt + "\n") +
+    "### End of logs ###\n\n"
   }
 }
