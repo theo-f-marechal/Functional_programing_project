@@ -15,13 +15,13 @@ object Error{
     def aux(list : List[AllErrorsOr[E]], nbLines: Long,
             nbV: Long, iList: List[String], vList: List[E]): (Long, List[String], List[E]) =
       list match {
-        case Nil => (((nbLines.toFloat / nbV.toFloat) * 100).toLong, iList, vList)
+        case Nil => (((nbV.toFloat / nbLines.toFloat) * 100).toLong, iList.reverse, vList.reverse) //
         case Valid(elt)::t => aux(t, nbLines+1, nbV+1, iList, elt::vList)
         case Invalid(elt)::t => aux(t, nbLines+1, nbV,
           (elt.foldLeft(" - Line no°" + nbLines.toString + " : ")((acc, x) => acc + x.value + " ") + " | end")::iList,
           vList)
     }
-    aux(listErrors, 1, 0, Nil, Nil)
+    aux(listErrors, 0, 0, Nil, Nil)
   }
 
   def formatError(errors : List[String], pathCSV: String): String = {
