@@ -1,7 +1,4 @@
-import StructureCSV._
-import MongoDB._
 import Swing.UI
-import Parser.Parser
 
 object Main {
   def main(args: Array[String]): Unit = {

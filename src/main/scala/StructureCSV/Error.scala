@@ -2,7 +2,6 @@ package StructureCSV
 
 import cats.data.Validated.{Invalid, Valid}
 import cats.data.ValidatedNel
-
 import scala.annotation.tailrec
 
 final case class Error(value: String) extends AnyVal
@@ -26,6 +25,6 @@ object Error{
 
   def formatError(errors : List[String], pathCSV: String): String = {
     errors.foldLeft("### Errors for " + pathCSV + " ###\n")((acc, elt) => acc + elt + "\n") +
-    "### End of logs for " + pathCSV + " ###"
+    "### End of logs for " + pathCSV + " ###\n\n"
   }
 }

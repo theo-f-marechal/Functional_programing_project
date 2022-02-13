@@ -1,74 +1,43 @@
 package MongoDB
 
-import com.mongodb.client.model.BsonField
-import com.mongodb.client.model.Projections.{elemMatch, exclude, excludeId, fields}
-import org.mongodb.scala.{Document, MongoClient, MongoCollection, MongoDatabase, Observable, Observer, model}
-import org.mongodb.scala.model.Accumulators.{first, sum}
-import org.mongodb.scala.model.Aggregates.{`match`, count, group, limit, lookup, project, sort}
-import org.mongodb.scala.model.BsonField
+import com.mongodb.client.model.Projections.{exclude, excludeId, fields}
+import org.mongodb.scala.model.Accumulators.sum
+import org.mongodb.scala.model.Aggregates._
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.Sorts.{ascending, descending}
+import org.mongodb.scala.{Document, MongoClient, MongoCollection, MongoDatabase, Observable}
+
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
+
 object Reader{
 
-  def query(inputCountry : String, isName : Boolean): Unit = {
+  def query(inputCountry : String, isName : Boolean): Observable[Document] = { //Seq[Document] = {
     val mongoClient : MongoClient = MongoClient()
-
     val database : MongoDatabase = mongoClient.getDatabase("test")
-
     val countriesCollection : MongoCollection[Document] = database.getCollection("countries")
 
-    // Case Country name as input
-    if (isName) {
-      val queryObservable: Observable[Document] = countriesCollection.aggregate(List(
-        `match`(equal("name", inputCountry)),
-        lookup(
-          "airports",
-          "code",
-          "isoCountry",
-          "airports"
-        ),
-        lookup(
-          "runways",
-          "airports.ident",
-          "airportIdent",
-          "runways"
-        )
-      ))
-      val queryResult = Await.result(queryObservable.toFuture(), Duration(5, java.util.concurrent.TimeUnit.SECONDS))
-      mongoClient.close()
-      println(queryResult)
-    }
-
-    // Case Country code as given
-    else {
-      val queryObservable: Observable[Document] = countriesCollection.aggregate(List(
-        `match`(equal("code", inputCountry)),
-        lookup(
-          "airports",
-          "code",
-          "isoCountry",
-          "airports"
-        ),
-        lookup(
-          "runways",
-          "airports.ident",
-          "airportIdent",
-          "runways"
-        )
-      ))
-      val queryResult = Await.result(queryObservable.toFuture(), Duration(5, java.util.concurrent.TimeUnit.SECONDS))
-      mongoClient.close()
-      println(queryResult)
-    }
-
-
+    val queryObservable: Observable[Document] = countriesCollection.aggregate(List(
+      `match`(equal({if (isName) "name" else "code"}, inputCountry)),
+      lookup(
+        "airports",
+        "code",
+        "isoCountry",
+        "airports"
+      ),
+      lookup(
+        "runways",
+        "airports.ident",
+        "airportIdent",
+        "runways"
+      )
+    ))
+    queryObservable
   }
 
-  def getReport1(): Unit = {
+  def getReport1: (List[(String,String)],List[(String,String)]) = {
     val mongoClient : MongoClient = MongoClient()
 
     val database : MongoDatabase = mongoClient.getDatabase("test")
@@ -100,31 +69,29 @@ object Reader{
 
     mongoClient.close()
 
-    val top10CountryFinalList = top10CountryList.flatMap(x => x)
-                                                .grouped(2)
-                                                .map { case List(key, value) => (key._2.toString.split("=")
-                                                                                                .last
-                                                                                                .replaceAll("^'|'|}$", ""),
-                                                                                 value._2.toString.split("=")
-                                                                                                  .last
-                                                                                                  .replaceAll("^|}$", ""))
-                                                }.toList
-    val bottom10CountryFinalList = bottom10CountryList.flatMap(x => x)
-                                                      .grouped(2)
-                                                      .map { case List(key, value) => (key._2.toString.split("=")
-                                                                                                      .last
-                                                                                                      .replaceAll("^'|'|}$", ""),
-                                                                                      value._2.toString.split("=")
-                                                                                                       .last
-                                                                                                       .replaceAll("^|}$", ""))
-                                                      }.toList
+    val top10CountryFinalList = top10CountryList.flatten
+      .grouped(2)
+      .map { case List(key, value) => (key._2.toString.split("=")
+        .last
+        .replaceAll("^'|'|}$", ""),
+        value._2.toString.split("=")
+          .last
+          .replaceAll("^|}$", ""))
+      }.toList
+    val bottom10CountryFinalList = bottom10CountryList.flatten
+      .grouped(2)
+      .map { case List(key, value) => (key._2.toString.split("=")
+        .last
+        .replaceAll("^'|'|}$", ""),
+        value._2.toString.split("=")
+          .last
+          .replaceAll("^|}$", ""))
+      }.toList
 
-    val report1 = (top10CountryFinalList, bottom10CountryFinalList)
-
-    println(report1)
+    (top10CountryFinalList, bottom10CountryFinalList)
   }
 
-  def getReport2(): Unit = {
+  def getReport2: Seq[Document] = {
     val mongoClient : MongoClient = MongoClient()
 
     val database : MongoDatabase = mongoClient.getDatabase("test")
@@ -144,25 +111,24 @@ object Reader{
         "runways"
       ),
       project(fields(excludeId(), exclude("airports._id",
-                                                     "airports.type",
-                                                     "airports.name",
-                                                     "airports.isoCountry",
-                                                     "airports.ident",
-                                                     "runways._id",
-                                                     "runways.airportRef",
-                                                     "runways.airportIdent",
-                                                     "runways.leIdent")))
+        "airports.type",
+        "airports.name",
+        "airports.isoCountry",
+        "airports.ident",
+        "runways._id",
+        "runways.airportRef",
+        "runways.airportIdent",
+        "runways.leIdent")))
     ))
 
     val report2Result = Await.result(queryObservable.toFuture(), Duration(10, java.util.concurrent.TimeUnit.SECONDS))
 
     mongoClient.close()
 
-    println(report2Result)
-
+    report2Result
   }
 
-  def getReport3(): Unit = {
+  def getReport3: List[(String,String)] = {
     val mongoClient : MongoClient = MongoClient()
 
     val database : MongoDatabase = mongoClient.getDatabase("test")
@@ -181,18 +147,18 @@ object Reader{
     mongoClient.close()
 
 
-    val report3 = report3Result.flatMap(x => x)
-                               .grouped(2)
-                               .map { case List(key, value) => (key._2.toString.split("=")
-                                                                               .last
-                                                                               .replaceAll("^'|'|}$", ""),
-                                                               value._2.toString.split("=")
-                                                                                .last
-                                                                                .replaceAll("^|}$", ""))
-                               }.toList
+    val report3 = report3Result.flatten
+      .grouped(2)
+      .map { case List(key, value) => (key._2.toString.split("=")
+        .last
+        .replaceAll("^'|'|}$", ""),
+        value._2.toString.split("=")
+          .last
+          .replaceAll("^|}$", ""))
+      }.toList
 
     println(report3Result)
-    println(report3)
+    report3
   }
 
 }

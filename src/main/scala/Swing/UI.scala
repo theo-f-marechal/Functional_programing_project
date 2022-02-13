@@ -1,10 +1,13 @@
 package Swing
+import MongoDB.Insertion.emptyDb
 import MongoDB.{Insertion, Reader}
-import StructureCSV.{Airport, Code, Country, Error, NonEmptyString, Runways}
 import Parser.Parser
 import StructureCSV.Error.AllErrorsOr
+import StructureCSV.{Airport, Code, Country, Error, NonEmptyString, Runways}
 import cats.data.Validated.{Invalid, Valid}
 
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
 import scala.swing.MenuBar.NoMenuBar.border
 import scala.swing._
 import scala.swing.event.ButtonClicked
@@ -140,11 +143,16 @@ class UI extends MainFrame {
         resultQuery.text = s"## ERROR ## : please enter a proper ${if (countryName.selected) "name" else "code"}"
       case Some(value) =>
         if (countryName.selected) {
-          resultQuery.text = value.str + " Name"
+          val reQuery = Reader.query(value.str,isName = true)
+          val docQuery = Await.result(reQuery.toFuture(),Duration(5, java.util.concurrent.TimeUnit.SECONDS))
+          resultQuery.text = Formatting.query(docQuery,name = true)
         } else {
           Code.validateCode(Some(value.str)) match {
             case Invalid(error) => resultQuery.text = "## ERROR ##" + error.head.value
-            case Valid(value) => resultQuery.text = value + " Code"
+            case Valid(value) =>
+              val reQuery = Reader.query(value.code,isName = false)
+              val docQuery = Await.result(reQuery.toFuture(),Duration(5, java.util.concurrent.TimeUnit.SECONDS))
+              resultQuery.text = Formatting.query(docQuery,name = false)
           }
         }
     }
@@ -155,11 +163,11 @@ class UI extends MainFrame {
     case ButtonClicked(`getReport`) =>
       resultReport.text = reportType.selection.index match {
         case 0 =>
-          Reader.getReport1().toString
+          Formatting.report1(Reader.getReport1)
         case 1 =>
-          Reader.getReport2().toString
+          Reader.getReport2.toString
         case 2 =>
-          Reader.getReport3().toString
+          Formatting.report3(Reader.getReport3)
     }
 
     // ---------------------------------------------------------------------------------------------------------
@@ -171,6 +179,10 @@ class UI extends MainFrame {
       insertion("./data/countries.csv", header = true)(Country.deserialization)(Insertion.insertCountry)
       insertion("./data/airports.csv", header = true)(Airport.deserialization)(Insertion.insertAirport)
       insertion("./data/runways.csv", header = true)(Runways.deserialization)(Insertion.insertRunways)
+
+    case ButtonClicked(`emptyDB`) =>
+      emptyDb()
+      dbErrorMsg.text = "emptying db"
   }
 
   def insertion[T](path: String, header: Boolean)
@@ -182,7 +194,7 @@ class UI extends MainFrame {
       insertionFunction(validList)
       dbErrorMsg.text += Error.formatError(errorList,path)
     } else {
-      dbErrorMsg.text = "### Too many invalid lines, insertion of" + path + " was aborted ###\n"
+      dbErrorMsg.text = "### Too many invalid lines, insertion of" + path + " was aborted ###\n\n"
       dbErrorMsg.text += Error.formatError(errorList,path)
     }
   }
